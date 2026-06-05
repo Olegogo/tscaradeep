@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101010">
+    <title>Tscaradeep | Каталог</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div></div>
+      <a class="brand" href="/" aria-label="Tscaradeep Lab">TSCARADEEP LAB</a>
+      <button class="cart-indicator" id="catalogCart" type="button" aria-label="Корзина">
+        <span id="cartCount" hidden></span>
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M7 8h10l1 12H6L7 8Z"></path>
+          <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <section class="catalog-shell" id="catalog" aria-label="Каталог">
+        <h1 class="sr-only">Каталог Tscaradeep</h1>
+        <div class="lab-board" id="productGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="product-detail" id="productDetail" aria-labelledby="detailTitle" hidden>
+        <button class="detail-icon detail-back" id="detailBack" type="button" aria-label="Назад">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M15 5 8 12l7 7"></path>
+          </svg>
+        </button>
+
+        <button class="detail-cart" type="button" aria-label="Корзина">
+          <span id="detailCartCount" hidden></span>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M7 8h10l1 12H6L7 8Z"></path>
+            <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+          </svg>
+        </button>
+
+        <button class="detail-arrow detail-arrow-prev" id="detailPrev" type="button" aria-label="Предыдущее изображение">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M15 5 8 12l7 7"></path>
+          </svg>
+        </button>
+
+        <div class="detail-media" id="detailMedia" aria-hidden="true"></div>
+
+        <button class="detail-arrow detail-arrow-next" id="detailNext" type="button" aria-label="Следующее изображение">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="m9 5 7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <div class="detail-info">
+          <div class="detail-dots" id="detailDots" aria-hidden="true"></div>
+          <h2 id="detailTitle">SL-03</h2>
+          <p class="detail-description" id="detailDescription"></p>
+          <p id="detailPrice">$100</p>
+          <button class="detail-add" id="detailAdd" type="button" aria-label="Добавить товар в корзину">Добавить</button>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="order-dialog" id="orderDialog" aria-labelledby="dialogTitle">
+      <form class="order-form" id="orderForm">
+        <button class="icon-button close-button" value="cancel" formmethod="dialog" type="button" aria-label="Закрыть">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M15 5 8 12l7 7"></path>
+          </svg>
+        </button>
+
+        <input type="hidden" name="productId" id="productId">
+
+        <section class="checkout-main" aria-label="Оформление заказа">
+          <div class="checkout-left">
+            <h2>Оформление заказа</h2>
+            <div class="checkout-fields">
+              <label>
+                <span>Имя</span>
+                <input name="name" autocomplete="name" required placeholder="Как к вам обращаться">
+              </label>
+              <label>
+                <span>Телефон</span>
+                <input name="phone" autocomplete="tel" required inputmode="tel" placeholder="+374 00 000 000">
+              </label>
+              <label class="wide">
+                <span>Telegram или Instagram</span>
+                <input name="contact" autocomplete="off" placeholder="@username">
+              </label>
+              <label class="wide">
+                <span>Комментарий</span>
+                <textarea name="comment" rows="4" placeholder="Размер, цвет, город, пожелания"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <aside class="checkout-summary" aria-label="Сводка заказа">
+            <h2>Заказ</h2>
+            <div class="summary-item">
+              <div class="summary-visual product-visual large" id="dialogVisual" aria-hidden="true"></div>
+              <div class="summary-lines">
+                <p id="dialogTitle">Название товара</p>
+                <p id="dialogDescription"></p>
+                <div class="summary-qty">
+                  <span>Количество</span>
+                  <button class="qty-button" id="qtyMinus" type="button" aria-label="Уменьшить количество">-</button>
+                  <span class="qty-value" id="quantityValue">1</span>
+                  <button class="qty-button" id="qtyPlus" type="button" aria-label="Увеличить количество">+</button>
+                  <input name="quantity" id="quantityInput" type="hidden" value="1">
+                </div>
+              </div>
+              <p class="dialog-price" id="dialogPrice"></p>
+            </div>
+
+            <p class="empty-cart-message" id="emptyCartMessage" hidden>Ваша корзина пустая</p>
+
+            <dl class="summary-totals">
+              <div class="total">
+                <dt>Итого</dt>
+                <dd id="summaryTotal"></dd>
+              </div>
+            </dl>
+
+            <p class="form-status" id="formStatus" role="status"></p>
+            <button class="submit-button" type="submit">Отправить</button>
+          </aside>
+        </section>
+      </form>
+    </dialog>
+
+    <template id="productTemplate">
+      <article class="product-card">
+        <button class="product-button" type="button">
+          <span class="product-visual" aria-hidden="true"></span>
+          <span class="product-title"></span>
+        </button>
+      </article>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

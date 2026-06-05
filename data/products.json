@@ -1,0 +1,110 @@
+[
+  {
+    "id": "cigarette-ring",
+    "sku": "TSL-001",
+    "name": "Кольцо с сигаретой",
+    "category": "Object",
+    "price": 3900,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 1,
+    "published": true,
+    "layout": { "x": 32, "y": 74, "w": 274, "h": 386 }
+  },
+  {
+    "id": "bike-saddle",
+    "sku": "TSL-002",
+    "name": "Велоседло",
+    "category": "Object",
+    "price": 5200,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 2,
+    "published": true,
+    "layout": { "x": 366, "y": 32, "w": 197, "h": 197 }
+  },
+  {
+    "id": "basketball-ring",
+    "sku": "TSL-003",
+    "name": "Перстень баскетбольный",
+    "category": "Object",
+    "price": 6100,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 3,
+    "published": true,
+    "layout": { "x": 520, "y": 166, "w": 365, "h": 365 }
+  },
+  {
+    "id": "fan-object",
+    "sku": "TSL-004",
+    "name": "Вентилятор Говно на вентиляторе",
+    "category": "Object",
+    "price": 7400,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 4,
+    "published": true,
+    "layout": { "x": 928, "y": 116, "w": 320, "h": 320 }
+  },
+  {
+    "id": "fractal-earrings",
+    "sku": "TSL-005",
+    "name": "Серьги фрактальные",
+    "category": "Object",
+    "price": 8900,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 5,
+    "published": true,
+    "layout": { "x": 0, "y": 514, "w": 488, "h": 488 }
+  },
+  {
+    "id": "political-usb",
+    "sku": "TSL-006",
+    "name": "Флешка политическая",
+    "category": "Object",
+    "price": 4700,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 6,
+    "published": true,
+    "layout": { "x": 720, "y": 560, "w": 430, "h": 430 }
+  },
+  {
+    "id": "warmer-wallet",
+    "sku": "TSL-007",
+    "name": "Кошелек грелка",
+    "category": "Object",
+    "price": 3500,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 7,
+    "published": true,
+    "layout": { "x": 350, "y": 836, "w": 337, "h": 337 }
+  },
+  {
+    "id": "slippery-pendant",
+    "sku": "TSL-008",
+    "name": "Подвеска скользкая",
+    "category": "Object",
+    "price": 6900,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 8,
+    "published": true,
+    "layout": { "x": 608, "y": 1100, "w": 470, "h": 470 }
+  },
+  {
+    "id": "toilet-paper",
+    "sku": "TSL-009",
+    "name": "Туалетная бумага",
+    "category": "Object",
+    "price": 1900,
+    "description": "Плейсхолдер товара для лабораторного каталога Tscaradeep.",
+    "status": "В наличии",
+    "order": 9,
+    "published": true,
+    "layout": { "x": 108, "y": 1226, "w": 395, "h": 560 }
+  }
+]
