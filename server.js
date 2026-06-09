@@ -28,13 +28,14 @@ const mimeTypes = new Map([
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || "/", `http://${req.headers.host}`);
+    const apiPath = normalizePath(url.pathname);
 
-    if (req.method === "POST" && url.pathname === "/api/order") {
+    if (req.method === "POST" && apiPath === "/api/order") {
       await handleOrder(req, res);
       return;
     }
 
-    if (req.method === "GET" && url.pathname === "/api/products") {
+    if (req.method === "GET" && apiPath === "/api/products") {
       sendJson(res, 200, { ok: true, products: await getProducts() });
       return;
     }
@@ -86,6 +87,10 @@ async function handleOrder(req, res) {
     mode: "telegram",
     message: "Заказ отправлен в Telegram."
   });
+}
+
+function normalizePath(pathname) {
+  return pathname.length > 1 ? pathname.replace(/\/+$/g, "") : pathname;
 }
 
 async function serveStatic(requestPath, res, headOnly) {
