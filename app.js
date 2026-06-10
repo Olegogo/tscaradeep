@@ -29,6 +29,7 @@ const quantityInput = document.querySelector("#quantityInput");
 const quantityValue = document.querySelector("#quantityValue");
 const qtyMinus = document.querySelector("#qtyMinus");
 const qtyPlus = document.querySelector("#qtyPlus");
+const checkoutScrolledClass = "is-scrolled";
 
 const formatPrice = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -262,6 +263,10 @@ function openOrder(product) {
   } else {
     dialog.setAttribute("open", "");
   }
+
+  dialog.scrollTop = 0;
+  updateCheckoutBackButton();
+  requestAnimationFrame(updateCheckoutBackButton);
 }
 
 function bindOrderForm() {
@@ -274,6 +279,12 @@ function bindOrderForm() {
     if (event.target === dialog) {
       dialog.close();
     }
+  });
+
+  dialog.addEventListener("scroll", updateCheckoutBackButton, { passive: true });
+  window.addEventListener("scroll", updateCheckoutBackButton, { passive: true });
+  dialog.addEventListener("close", () => {
+    dialog.classList.remove(checkoutScrolledClass);
   });
 
   form.addEventListener("submit", async (event) => {
@@ -315,6 +326,15 @@ function bindOrderForm() {
       submitButton.disabled = false;
     }
   });
+}
+
+function updateCheckoutBackButton() {
+  if (!dialog.open) {
+    return;
+  }
+
+  const scrollTop = Math.max(dialog.scrollTop, form.scrollTop, window.scrollY);
+  dialog.classList.toggle(checkoutScrolledClass, scrollTop > 4);
 }
 
 function resetCheckoutSummary() {
