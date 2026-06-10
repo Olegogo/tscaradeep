@@ -42,6 +42,11 @@ let selectedProductIndex = 0;
 let selectedImageIndex = 0;
 let cartItemsCount = 0;
 let cartProductId = "";
+let catalogScrollY = 0;
+let detailWheelLocked = false;
+let detailScrollFrame = 0;
+const imagePreloadCache = new Set();
+const mobileGalleryQuery = window.matchMedia("(max-width: 900px)");
 
 init();
 
@@ -68,10 +73,11 @@ async function fetchProducts() {
 function renderProducts() {
   productGrid.innerHTML = "";
 
-  products.forEach((product) => {
+  products.forEach((product, index) => {
     const card = template.content.firstElementChild.cloneNode(true);
     const button = card.querySelector(".product-button");
     const visual = card.querySelector(".product-visual");
+    const image = card.querySelector("img");
     const title = card.querySelector(".product-title");
     const layout = product.layout || {};
 
@@ -85,7 +91,12 @@ function renderProducts() {
     button.addEventListener("click", () => openProductDetail(product.id));
 
     if (product.image) {
-      visual.style.backgroundImage = `url("${product.image}")`;
+      image.src = product.image;
+      image.hidden = false;
+      image.loading = index < 2 ? "eager" : "lazy";
+      image.decoding = "async";
+      image.fetchPriority = index === 0 ? "high" : "low";
+      image.sizes = "(max-width: 900px) calc(100vw - 28px), 33vw";
       visual.classList.add("has-image");
     }
 
@@ -97,6 +108,8 @@ function bindProductDetail() {
   detailBack.addEventListener("click", closeProductDetail);
   detailPrev.addEventListener("click", () => navigateImage(-1));
   detailNext.addEventListener("click", () => navigateImage(1));
+  detailMedia.addEventListener("scroll", handleDetailImageScroll, { passive: true });
+  detailMedia.addEventListener("wheel", handleDetailImageWheel, { passive: false });
   detailAdd.addEventListener("click", handleDetailAdd);
 
   document.addEventListener("keydown", (event) => {
@@ -132,17 +145,21 @@ function openProductDetail(productId) {
   const index = products.findIndex((product) => product.id === productId);
   selectedProductIndex = Math.max(0, index);
   selectedImageIndex = 0;
+  catalogScrollY = window.scrollY;
   catalog.hidden = true;
   productDetail.hidden = false;
   document.body.classList.add("is-detail");
   renderProductDetail();
-  window.scrollTo({ top: 0, behavior: "instant" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function closeProductDetail() {
   productDetail.hidden = true;
   catalog.hidden = false;
   document.body.classList.remove("is-detail");
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: catalogScrollY, behavior: "auto" });
+  });
 }
 
 function navigateImage(direction) {
@@ -171,9 +188,11 @@ function renderProductDetail() {
   setCartCount(cartItemsCount);
   const images = getProductImages(product);
   const currentImage = images[selectedImageIndex] || "";
-  detailMedia.style.backgroundImage = currentImage ? `url("${currentImage}")` : "";
+  renderDetailImages(images);
   detailMedia.classList.toggle("has-image", Boolean(currentImage));
+  detailMedia.classList.toggle("has-gallery", images.length > 1);
   detailMedia.setAttribute("aria-label", product.name);
+  preloadAdjacentDetailImages(images);
   const isInCart = cartProductId === product.id && cartItemsCount > 0;
   detailAdd.textContent = isInCart ? "В корзину" : "Добавить";
   detailAdd.setAttribute(
@@ -191,6 +210,106 @@ function renderProductDetail() {
     dot.className = index === selectedImageIndex ? "active" : "";
     detailDots.append(dot);
   });
+
+  scrollDetailGalleryToSelected();
+}
+
+function renderDetailImages(images) {
+  detailMedia.innerHTML = "";
+
+  images.forEach((src, index) => {
+    const image = document.createElement("img");
+    image.alt = "";
+    image.decoding = "async";
+    image.loading = index === selectedImageIndex ? "eager" : "lazy";
+    image.fetchPriority = index === selectedImageIndex ? "high" : "low";
+    image.src = src;
+    image.className = index === selectedImageIndex ? "is-active" : "";
+    image.dataset.index = String(index);
+    detailMedia.append(image);
+  });
+}
+
+function handleDetailImageWheel(event) {
+  const images = getProductImages(products[selectedProductIndex]);
+
+  if (images.length <= 1 || isMobileDetailGallery()) {
+    return;
+  }
+
+  const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+
+  if (Math.abs(delta) < 8) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (detailWheelLocked) {
+    return;
+  }
+
+  detailWheelLocked = true;
+  navigateImage(delta > 0 ? 1 : -1);
+  window.setTimeout(() => {
+    detailWheelLocked = false;
+  }, 280);
+}
+
+function handleDetailImageScroll() {
+  if (!isMobileDetailGallery()) {
+    return;
+  }
+
+  if (detailScrollFrame) {
+    return;
+  }
+
+  detailScrollFrame = requestAnimationFrame(() => {
+    detailScrollFrame = 0;
+    const images = getProductImages(products[selectedProductIndex]);
+    const nextIndex = Math.max(
+      0,
+      Math.min(images.length - 1, Math.round(detailMedia.scrollLeft / detailMedia.clientWidth))
+    );
+
+    if (nextIndex === selectedImageIndex) {
+      return;
+    }
+
+    selectedImageIndex = nextIndex;
+    updateDetailGalleryState(images);
+  });
+}
+
+function updateDetailGalleryState(images) {
+  Array.from(detailMedia.querySelectorAll("img")).forEach((image, index) => {
+    image.classList.toggle("is-active", index === selectedImageIndex);
+    image.fetchPriority = index === selectedImageIndex ? "high" : "low";
+  });
+
+  Array.from(detailDots.children).forEach((dot, index) => {
+    dot.classList.toggle("active", index === selectedImageIndex);
+  });
+
+  preloadAdjacentDetailImages(images);
+}
+
+function scrollDetailGalleryToSelected() {
+  requestAnimationFrame(() => {
+    if (!isMobileDetailGallery()) {
+      return;
+    }
+
+    detailMedia.scrollTo({
+      left: selectedImageIndex * detailMedia.clientWidth,
+      behavior: "auto"
+    });
+  });
+}
+
+function isMobileDetailGallery() {
+  return mobileGalleryQuery.matches && detailMedia.classList.contains("has-gallery");
 }
 
 function handleDetailAdd() {
@@ -264,7 +383,9 @@ function openOrder(product) {
     dialog.setAttribute("open", "");
   }
 
+  dialog.classList.remove(checkoutScrolledClass);
   dialog.scrollTop = 0;
+  form.scrollTop = 0;
   updateCheckoutBackButton();
   requestAnimationFrame(updateCheckoutBackButton);
 }
@@ -282,7 +403,6 @@ function bindOrderForm() {
   });
 
   dialog.addEventListener("scroll", updateCheckoutBackButton, { passive: true });
-  window.addEventListener("scroll", updateCheckoutBackButton, { passive: true });
   dialog.addEventListener("close", () => {
     dialog.classList.remove(checkoutScrolledClass);
   });
@@ -333,7 +453,7 @@ function updateCheckoutBackButton() {
     return;
   }
 
-  const scrollTop = Math.max(dialog.scrollTop, form.scrollTop, window.scrollY);
+  const scrollTop = Math.max(dialog.scrollTop, form.scrollTop);
   dialog.classList.toggle(checkoutScrolledClass, scrollTop > 4);
 }
 
@@ -421,4 +541,26 @@ function getProductImages(product) {
   }
 
   return product.image ? [product.image] : [];
+}
+
+function preloadAdjacentDetailImages(images) {
+  if (images.length <= 1) {
+    return;
+  }
+
+  const previousImage = images[(selectedImageIndex - 1 + images.length) % images.length];
+  const nextImage = images[(selectedImageIndex + 1) % images.length];
+  preloadImage(previousImage);
+  preloadImage(nextImage);
+}
+
+function preloadImage(src) {
+  if (!src || imagePreloadCache.has(src)) {
+    return;
+  }
+
+  const image = new Image();
+  image.decoding = "async";
+  image.src = src;
+  imagePreloadCache.add(src);
 }
