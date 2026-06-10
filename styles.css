@@ -392,8 +392,8 @@ a {
 
 .close-button {
   position: fixed;
-  top: var(--nav-y);
-  left: var(--nav-x);
+  top: calc(var(--nav-y) - 4px);
+  left: calc(var(--nav-x) - 4px);
   z-index: 40;
 }
 
@@ -410,6 +410,9 @@ a {
 }
 
 .close-button {
+  width: calc(var(--nav-size) + 8px);
+  height: calc(var(--nav-size) + 8px);
+  border-radius: 999px;
   border-color: rgba(5, 5, 5, 0.16);
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
