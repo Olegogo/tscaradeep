@@ -24,6 +24,7 @@ const summaryTotal = document.querySelector("#summaryTotal");
 const summaryItem = document.querySelector(".summary-item");
 const summaryTotals = document.querySelector(".summary-totals");
 const emptyCartMessage = document.querySelector("#emptyCartMessage");
+const orderSentMessage = document.querySelector("#orderSentMessage");
 const quantityInput = document.querySelector("#quantityInput");
 const quantityValue = document.querySelector("#quantityValue");
 const qtyMinus = document.querySelector("#qtyMinus");
@@ -236,6 +237,7 @@ function openOrder(product) {
   form.reset();
   formStatus.textContent = "";
   formStatus.className = "form-status";
+  resetCheckoutSummary();
   quantityInput.value = "1";
   quantityValue.textContent = "1";
   document.querySelector("#productId").value = product.id;
@@ -302,21 +304,35 @@ function bindOrderForm() {
         throw new Error(data.error || "Не удалось отправить заказ");
       }
 
-      setStatus(data.message, "success");
+      showOrderSentMessage();
       form.reset();
       cartProductId = "";
       setCartCount(0);
-
-      window.setTimeout(() => {
-        dialog.close();
-        renderProductDetail();
-      }, 1300);
+      renderProductDetail();
     } catch (error) {
       setStatus(error.message, "error");
     } finally {
       submitButton.disabled = false;
     }
   });
+}
+
+function resetCheckoutSummary() {
+  summaryItem.hidden = false;
+  summaryTotals.hidden = false;
+  form.querySelector(".submit-button").hidden = false;
+  emptyCartMessage.hidden = true;
+  orderSentMessage.hidden = true;
+}
+
+function showOrderSentMessage() {
+  summaryItem.hidden = true;
+  summaryTotals.hidden = true;
+  form.querySelector(".submit-button").hidden = true;
+  emptyCartMessage.hidden = true;
+  orderSentMessage.hidden = false;
+  formStatus.textContent = "";
+  formStatus.className = "form-status";
 }
 
 function adjustQuantity(delta) {
@@ -358,6 +374,7 @@ function updateOrderSummary(product) {
   summaryTotals.hidden = isEmpty;
   form.querySelector(".submit-button").hidden = isEmpty;
   emptyCartMessage.hidden = !isEmpty;
+  orderSentMessage.hidden = true;
   formStatus.textContent = "";
 
   if (isEmpty) {
