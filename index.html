@@ -103,17 +103,21 @@
             <div class="summary-item">
               <div class="summary-visual product-visual large" id="dialogVisual" aria-hidden="true"></div>
               <div class="summary-lines">
-                <p id="dialogTitle">Название товара</p>
+                <div class="summary-title-row">
+                  <p id="dialogTitle">Название товара</p>
+                  <p class="dialog-price" id="dialogPrice"></p>
+                </div>
                 <p id="dialogDescription"></p>
                 <div class="summary-qty">
                   <span>Количество</span>
-                  <button class="qty-button" id="qtyMinus" type="button" aria-label="Уменьшить количество">-</button>
-                  <span class="qty-value" id="quantityValue">1</span>
-                  <button class="qty-button" id="qtyPlus" type="button" aria-label="Увеличить количество">+</button>
-                  <input name="quantity" id="quantityInput" type="hidden" value="1">
+                  <span class="qty-controls">
+                    <button class="qty-button" id="qtyMinus" type="button" aria-label="Уменьшить количество">-</button>
+                    <span class="qty-value" id="quantityValue">1</span>
+                    <button class="qty-button" id="qtyPlus" type="button" aria-label="Увеличить количество">+</button>
+                    <input name="quantity" id="quantityInput" type="hidden" value="1">
+                  </span>
                 </div>
               </div>
-              <p class="dialog-price" id="dialogPrice"></p>
             </div>
 
             <p class="empty-cart-message" id="emptyCartMessage" hidden>Ваша корзина пустая</p>

@@ -42,7 +42,6 @@ let selectedProductIndex = 0;
 let selectedImageIndex = 0;
 let cartItemsCount = 0;
 let cartProductId = "";
-let catalogScrollY = 0;
 let detailWheelLocked = false;
 let detailScrollFrame = 0;
 const imagePreloadCache = new Set();
@@ -81,6 +80,7 @@ function renderProducts() {
     const title = card.querySelector(".product-title");
     const layout = product.layout || {};
 
+    card.id = getProductAnchorId(product.id);
     card.style.setProperty("--x", Number(layout.x || 0));
     card.style.setProperty("--y", Number(layout.y || 0));
     card.style.setProperty("--w", Number(layout.w || 320));
@@ -145,7 +145,6 @@ function openProductDetail(productId) {
   const index = products.findIndex((product) => product.id === productId);
   selectedProductIndex = Math.max(0, index);
   selectedImageIndex = 0;
-  catalogScrollY = window.scrollY;
   catalog.hidden = true;
   productDetail.hidden = false;
   document.body.classList.add("is-detail");
@@ -154,12 +153,11 @@ function openProductDetail(productId) {
 }
 
 function closeProductDetail() {
+  const product = products[selectedProductIndex];
   productDetail.hidden = true;
   catalog.hidden = false;
   document.body.classList.remove("is-detail");
-  requestAnimationFrame(() => {
-    window.scrollTo({ top: catalogScrollY, behavior: "auto" });
-  });
+  restoreCatalogAnchor(product);
 }
 
 function navigateImage(direction) {
@@ -541,6 +539,27 @@ function getProductImages(product) {
   }
 
   return product.image ? [product.image] : [];
+}
+
+function getProductAnchorId(productId) {
+  return `product-${productId}`;
+}
+
+function restoreCatalogAnchor(product) {
+  const target = product ? document.getElementById(getProductAnchorId(product.id)) : null;
+
+  if (!target) {
+    return;
+  }
+
+  const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+  document.documentElement.style.scrollBehavior = "auto";
+  target.scrollIntoView({
+    block: "center",
+    inline: "nearest",
+    behavior: "auto"
+  });
+  document.documentElement.style.scrollBehavior = previousScrollBehavior;
 }
 
 function preloadAdjacentDetailImages(images) {
